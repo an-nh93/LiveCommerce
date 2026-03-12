@@ -69,6 +69,26 @@ Mở http://localhost:5173. Đăng nhập mặc định (sau khi seed): **Mã sh
   - `Cors:Origins` – origin frontend (ví dụ http://localhost:5173)
 - **Frontend**: `VITE_API_URL` (để trỏ API; để trống thì dùng proxy Vite tới backend)
 
+## Health checks
+
+API có endpoint readiness cho load balancer / orchestrator:
+
+- **GET** `/health/ready` – kiểm tra PostgreSQL và RabbitMQ. Trả về JSON: `status` (Healthy/Unhealthy/Degraded) và danh sách `checks` (postgres, rabbitmq).
+
+Ví dụ:
+
+```bash
+curl http://localhost:5000/health/ready
+```
+
+## Triển khai (checklist)
+
+- Cấu hình `ConnectionStrings:DefaultConnection`, `Jwt:*`, `RabbitMQ:*`, `Cors:Origins` (production).
+- Chạy migrations: `dotnet ef database update --project LiveCommerce.Infrastructure --startup-project LiveCommerce.Api`.
+- Chạy **LiveCommerce.Api** và **LiveCommerce.Worker** (cùng DB, cùng RabbitMQ).
+- Build frontend: `cd frontend && npm ci && npm run build`; host thư mục `dist` qua CDN/web server.
+- Cấu hình reverse proxy (nginx/IIS) cho API và `/hubs` (WebSocket) nếu cần.
+
 ## Các module theo PRD (đã có skeleton)
 
 - Auth & RBAC (JWT, shop + user, permission)

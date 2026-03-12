@@ -2,8 +2,10 @@ using System.Text;
 using LiveCommerce.Infrastructure;
 using LiveCommerce.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using RabbitMQ.Client;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -64,6 +66,18 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
+var connStr = builder.Configuration.GetConnectionString("DefaultConnection");
+var rabbitHost = builder.Configuration["RabbitMQ:HostName"] ?? "localhost";
+var rabbitUri = new Uri($"amqp://{builder.Configuration["RabbitMQ:UserName"] ?? "guest"}:{builder.Configuration["RabbitMQ:Password"] ?? "guest"}@{rabbitHost}:{builder.Configuration["RabbitMQ:Port"] ?? "5672"}");
+builder.Services.AddSingleton<IConnection>(_ =>
+{
+    var factory = new ConnectionFactory { Uri = rabbitUri };
+    return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+});
+builder.Services.AddHealthChecks()
+    .AddNpgSql(connStr ?? "Host=localhost;Database=livecommerce;Username=postgres;Password=postgres", name: "postgres")
+    .AddRabbitMQ(name: "rabbitmq");
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -78,6 +92,20 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHub<LiveCommerce.Api.Hubs.CommentHub>("/hubs/comments");
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = _ => true,
+    ResponseWriter = async (ctx, report) =>
+    {
+        ctx.Response.ContentType = "application/json";
+        var result = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            status = report.Status.ToString(),
+            checks = report.Entries.Select(e => new { name = e.Key, status = e.Value.Status.ToString(), description = e.Value.Description?.ToString() })
+        });
+        await ctx.Response.WriteAsync(result);
+    }
+});
 
 // Apply migrations on startup in dev (optional)
 using (var scope = app.Services.CreateScope())
