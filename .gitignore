@@ -1,0 +1,49 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.dll
+*.exe
+*.pdb
+*.log
+.vs/
+*.vspscc
+*.vssscc
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Node / Frontend
+node_modules/
+frontend/node_modules/
+npm-debug.log*
+.npm
+dist/
+frontend/dist/
+*.local
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp / Doc extract (from reading .docx)
+docx_extract/
+temp_spec.zip
+doc_content.txt
+
+# Secrets
+appsettings.*.local.json
+*.pfx
