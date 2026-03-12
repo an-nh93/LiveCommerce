@@ -105,3 +105,72 @@ export interface CommentDetailDto extends CommentListDto {
   customerName?: string;
   customerPhone?: string;
 }
+
+export interface ProductVariantDto {
+  id: number;
+  sku: string;
+  color?: string;
+  size?: string;
+  price: number;
+}
+export interface ProductListDto {
+  id: number;
+  code: string;
+  name: string;
+  category?: string;
+  basePrice: number;
+  isActive: boolean;
+  variants: ProductVariantDto[];
+}
+export interface OrderListDto {
+  id: number;
+  orderNo: string;
+  liveSessionId?: number;
+  receiverName?: string;
+  receiverPhone?: string;
+  totalAmount: number;
+  status: number;
+  assignedUserName?: string;
+  createdAtUtc: string;
+}
+export interface OrderItemDto {
+  productVariantId: number;
+  productName?: string;
+  sku?: string;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+}
+export interface OrderDetailDto extends OrderListDto {
+  receiverAddress?: string;
+  note?: string;
+  subTotal: number;
+  shippingFee: number;
+  discount: number;
+  commentId?: number;
+  customerId?: number;
+  items: OrderItemDto[];
+}
+
+export const productsApi = {
+  list: () => api.get<ApiResponse<ProductListDto[]>>('/products'),
+};
+export const ordersApi = {
+  list: (params: { liveSessionId?: number; status?: number; search?: string; page?: number; pageSize?: number }) =>
+    api.get<ApiResponse<PagedResult<OrderListDto>>>('/orders', { params }),
+  getById: (id: number) => api.get<ApiResponse<OrderDetailDto>>(`/orders/${id}`),
+  create: (body: CreateOrderRequest) => api.post<ApiResponse<OrderDetailDto>>('/orders', body),
+  updateStatus: (id: number, status: number, note?: string) => api.post<ApiResponse<OrderDetailDto>>(`/orders/${id}/status`, { status, note }),
+};
+export interface CreateOrderRequest {
+  liveSessionId?: number;
+  commentId?: number;
+  customerId?: number;
+  receiverName?: string;
+  receiverPhone?: string;
+  receiverAddress?: string;
+  note?: string;
+  shippingFee?: number;
+  discount?: number;
+  items: { productVariantId: number; quantity: number; unitPrice: number }[];
+}

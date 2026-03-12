@@ -1,6 +1,8 @@
 using LiveCommerce.Application.Common;
 using LiveCommerce.Application.Comments;
 using LiveCommerce.Application.LiveSessions;
+using LiveCommerce.Application.Orders;
+using LiveCommerce.Application.Products;
 using LiveCommerce.Infrastructure.Messaging;
 using LiveCommerce.Infrastructure.Persistence;
 using LiveCommerce.Infrastructure.Services;
@@ -35,6 +37,8 @@ public static class DependencyInjection
         services.AddScoped<ICommentQueryService, CommentQueryService>();
         services.AddScoped<ICommentAssignmentService, CommentAssignmentService>();
         services.AddScoped<ILiveSessionService, LiveSessionService>();
+        services.AddScoped<IProductQueryService, ProductQueryService>();
+        services.AddScoped<IOrderService, OrderService>();
 
         return services;
     }

@@ -80,6 +80,27 @@ public static class SeedData
         db.LiveSessions.Add(liveSession);
         await db.SaveChangesAsync(ct);
 
-        logger.LogInformation("Seed data created: Shop SHOP01, user admin/admin123, channel, live session");
+        var product = new Product
+        {
+            ShopId = shop.Id,
+            Code = "SP01",
+            Name = "Sản phẩm mẫu",
+            BasePrice = 100000,
+            IsActive = true,
+            CreatedAtUtc = DateTime.UtcNow
+        };
+        db.Products.Add(product);
+        await db.SaveChangesAsync(ct);
+        db.ProductVariants.Add(new ProductVariant
+        {
+            ProductId = product.Id,
+            Sku = "SP01-DEF",
+            Price = 100000,
+            IsActive = true,
+            CreatedAtUtc = DateTime.UtcNow
+        });
+        await db.SaveChangesAsync(ct);
+
+        logger.LogInformation("Seed data created: Shop SHOP01, user admin/admin123, channel, live session, product");
     }
 }

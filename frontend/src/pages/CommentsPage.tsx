@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, Table, Select, Space, Typography, Drawer, Button, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import * as signalR from '@microsoft/signalr';
@@ -18,6 +19,7 @@ const COMMENT_STATUS: Record<number, string> = {
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
 export function CommentsPage() {
+  const navigate = useNavigate();
   const token = useAuthStore((s) => s.accessToken);
   const [sessions, setSessions] = useState<LiveSessionDto[]>([]);
   const [comments, setComments] = useState<CommentListDto[]>([]);
@@ -207,6 +209,9 @@ export function CommentsPage() {
               ) : null}
               {selected.status === 1 || selected.status === 2 ? (
                 <>
+                  <Button type="primary" loading={actionLoading} onClick={() => navigate(`/quick-order?commentId=${selected.id}&liveSessionId=${selected.liveSessionId}`, { state: { receiverName: selected.senderName, receiverPhone: selected.customerPhone } })}>
+                    Tạo đơn
+                  </Button>
                   <Button loading={actionLoading} onClick={() => handleStatus(2)}>Đang xử lý</Button>
                   <Button loading={actionLoading} onClick={() => handleStatus(3)}>Đã đặt hàng</Button>
                   <Button loading={actionLoading} onClick={() => handleStatus(4)}>Cần follow-up</Button>
