@@ -1,4 +1,5 @@
 using LiveCommerce.Application.Orders;
+using LiveCommerce.Application.Blacklists;
 using LiveCommerce.Domain.Entities;
 using LiveCommerce.Domain.Enums;
 using LiveCommerce.Infrastructure.Persistence;
@@ -10,14 +11,17 @@ namespace LiveCommerce.Infrastructure.Services;
 public class OrderService : IOrderService
 {
     private readonly AppDbContext _db;
+    private readonly IBlacklistService _blacklist;
 
-    public OrderService(AppDbContext db)
+    public OrderService(AppDbContext db, IBlacklistService blacklist)
     {
         _db = db;
+        _blacklist = blacklist;
     }
 
-    public async Task<OrderDetailDto?> CreateAsync(long shopId, long userId, CreateOrderRequest request, CancellationToken ct = default)
+    public async Task<CreateOrderResult> CreateAsync(long shopId, long userId, CreateOrderRequest request, CancellationToken ct = default)
     {
+        var riskWarning = await _blacklist.IsBlacklistedAsync(shopId, request.ReceiverPhone, request.ReceiverAddress, ct) ? "Số điện thoại hoặc địa chỉ nằm trong blacklist." : null;
         var orderNo = $"ORD-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..8]}";
         var order = new Order
         {
@@ -91,7 +95,8 @@ public class OrderService : IOrderService
             throw;
         }
 
-        return await GetByIdAsync(order.Id, shopId, ct);
+        var orderDetail = await GetByIdAsync(order.Id, shopId, ct);
+        return new CreateOrderResult { Order = orderDetail!, RiskWarning = riskWarning };
     }
 
     public async Task<PagedResult<OrderListDto>> GetListAsync(long shopId, OrderFilterDto filter, CancellationToken ct = default)

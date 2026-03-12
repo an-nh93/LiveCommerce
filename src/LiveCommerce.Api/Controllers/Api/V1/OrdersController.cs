@@ -19,12 +19,11 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ApiResponse<OrderDetailDto>>> Create([FromBody] CreateOrderRequest request, CancellationToken ct)
+    public async Task<ActionResult<ApiResponse<CreateOrderResult>>> Create([FromBody] CreateOrderRequest request, CancellationToken ct)
     {
         if (!GetShopAndUser(out var shopId, out var userId)) return Unauthorized();
-        var order = await _service.CreateAsync(shopId, userId, request, ct);
-        if (order == null) return BadRequest(ApiResponse<OrderDetailDto>.Fail("Cannot create order."));
-        return Ok(ApiResponse<OrderDetailDto>.Ok(order));
+        var result = await _service.CreateAsync(shopId, userId, request, ct);
+        return Ok(ApiResponse<CreateOrderResult>.Ok(result));
     }
 
     [HttpGet]

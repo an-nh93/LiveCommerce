@@ -159,9 +159,13 @@ export const ordersApi = {
   list: (params: { liveSessionId?: number; status?: number; search?: string; page?: number; pageSize?: number }) =>
     api.get<ApiResponse<PagedResult<OrderListDto>>>('/orders', { params }),
   getById: (id: number) => api.get<ApiResponse<OrderDetailDto>>(`/orders/${id}`),
-  create: (body: CreateOrderRequest) => api.post<ApiResponse<OrderDetailDto>>('/orders', body),
+  create: (body: CreateOrderRequest) => api.post<ApiResponse<CreateOrderResult>>('/orders', body),
   updateStatus: (id: number, status: number, note?: string) => api.post<ApiResponse<OrderDetailDto>>(`/orders/${id}/status`, { status, note }),
 };
+export interface CreateOrderResult {
+  order: OrderDetailDto;
+  riskWarning?: string;
+}
 export interface CreateOrderRequest {
   liveSessionId?: number;
   commentId?: number;
@@ -174,3 +178,48 @@ export interface CreateOrderRequest {
   discount?: number;
   items: { productVariantId: number; quantity: number; unitPrice: number }[];
 }
+
+export interface LiveSummaryDto {
+  liveSessionId: number;
+  liveSessionName: string;
+  commentCount: number;
+  newCount: number;
+  orderedCount: number;
+  orderCount: number;
+  estimatedRevenue: number;
+}
+export interface UserPerformanceDto {
+  userId: number;
+  userName: string;
+  commentsHandled: number;
+  ordersCreated: number;
+  orderRevenue: number;
+}
+export interface TopProductDto {
+  productId: number;
+  productName: string;
+  quantitySold: number;
+  revenue: number;
+}
+export const dashboardApi = {
+  liveSummary: (params?: { liveSessionId?: number; fromUtc?: string; toUtc?: string }) =>
+    api.get<ApiResponse<LiveSummaryDto[]>>('/dashboard/live-summary', { params }),
+  userPerformance: (params?: { liveSessionId?: number; fromUtc?: string; toUtc?: string }) =>
+    api.get<ApiResponse<UserPerformanceDto[]>>('/dashboard/user-performance', { params }),
+  topProducts: (params?: { liveSessionId?: number; fromUtc?: string; toUtc?: string; top?: number }) =>
+    api.get<ApiResponse<TopProductDto[]>>('/dashboard/top-products', { params }),
+};
+
+export interface BlacklistDto {
+  id: number;
+  phone?: string;
+  address?: string;
+  name?: string;
+  level: number;
+  reason?: string;
+}
+export const blacklistsApi = {
+  list: () => api.get<ApiResponse<BlacklistDto[]>>('/blacklists'),
+  create: (body: { phone?: string; address?: string; name?: string; level?: number; reason?: string }) =>
+    api.post<ApiResponse<BlacklistDto>>('/blacklists', body),
+};

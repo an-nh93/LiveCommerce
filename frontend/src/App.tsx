@@ -8,6 +8,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { CommentsPage } from './pages/CommentsPage';
 import { OrdersPage } from './pages/OrdersPage';
 import { QuickOrderPage } from './pages/QuickOrderPage';
+import { BlacklistsPage } from './pages/BlacklistsPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { accessToken, hydrated } = useAuthStore();
@@ -40,6 +41,7 @@ export default function App() {
             <Route path="comments" element={<CommentsPage />} />
             <Route path="orders" element={<OrdersPage />} />
             <Route path="quick-order" element={<QuickOrderPage />} />
+            <Route path="blacklists" element={<BlacklistsPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

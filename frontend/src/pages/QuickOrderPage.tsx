@@ -64,7 +64,9 @@ export function QuickOrderPage() {
         items: lines.map((l) => ({ productVariantId: l.productVariantId, quantity: l.quantity, unitPrice: l.price })),
       });
       if (data.success && data.data) {
-        message.success('Tạo đơn thành công: ' + data.data.orderNo);
+        const result = data.data;
+        if (result.riskWarning) message.warning(result.riskWarning);
+        message.success('Tạo đơn thành công: ' + result.order.orderNo);
         form.resetFields();
         setLines([]);
       } else message.error(data.message || 'Lỗi');

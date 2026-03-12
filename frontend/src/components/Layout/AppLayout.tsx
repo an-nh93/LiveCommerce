@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Outlet, useNavigate, Link } from 'react-router-dom';
 import { Layout, Menu, Button } from 'antd';
-import { DashboardOutlined, LogoutOutlined, CommentOutlined, ShoppingOutlined, PlusOutlined } from '@ant-design/icons';
+import { DashboardOutlined, LogoutOutlined, CommentOutlined, ShoppingOutlined, PlusOutlined, StopOutlined } from '@ant-design/icons';
 import { useAuthStore } from '../../stores/authStore';
 
 const { Header, Content } = Layout;
@@ -21,6 +21,7 @@ export function AppLayout() {
     { key: 'comments', icon: <CommentOutlined />, label: <Link to="/comments">Comment Center</Link> },
     { key: 'quick-order', icon: <PlusOutlined />, label: <Link to="/quick-order">Quick Order</Link> },
     { key: 'orders', icon: <ShoppingOutlined />, label: <Link to="/orders">Đơn hàng</Link> },
+    { key: 'blacklists', icon: <StopOutlined />, label: <Link to="/blacklists">Blacklist</Link> },
   ];
 
   return (

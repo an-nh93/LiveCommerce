@@ -4,10 +4,16 @@ namespace LiveCommerce.Application.Orders;
 
 public interface IOrderService
 {
-    Task<OrderDetailDto?> CreateAsync(long shopId, long userId, CreateOrderRequest request, CancellationToken ct = default);
+    Task<CreateOrderResult> CreateAsync(long shopId, long userId, CreateOrderRequest request, CancellationToken ct = default);
     Task<LiveCommerce.Shared.PagedResult<OrderListDto>> GetListAsync(long shopId, OrderFilterDto filter, CancellationToken ct = default);
     Task<OrderDetailDto?> GetByIdAsync(long orderId, long shopId, CancellationToken ct = default);
     Task<OrderDetailDto?> UpdateStatusAsync(long orderId, OrderStatus status, long userId, long shopId, string? note, CancellationToken ct = default);
+}
+
+public class CreateOrderResult
+{
+    public OrderDetailDto Order { get; set; } = null!;
+    public string? RiskWarning { get; set; }
 }
 
 public class OrderFilterDto
