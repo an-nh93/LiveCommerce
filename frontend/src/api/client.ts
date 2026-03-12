@@ -223,3 +223,20 @@ export const blacklistsApi = {
   create: (body: { phone?: string; address?: string; name?: string; level?: number; reason?: string }) =>
     api.post<ApiResponse<BlacklistDto>>('/blacklists', body),
 };
+
+export interface UserListDto { id: number; username: string; displayName?: string; roleCode: string; isActive: boolean; }
+export interface RoleListDto { id: number; code: string; name: string; permissionCodes: string[]; }
+export interface ChannelConnectionDto { id: number; channelType: number; channelName: string; isActive: boolean; }
+export interface FollowUpListDto { id: number; targetTimeUtc: string; status: number; note?: string; assignedUserName?: string; commentId?: number; customerId?: number; }
+export const usersApi = { list: () => api.get<ApiResponse<UserListDto[]>>('/users') };
+export const rolesApi = { list: () => api.get<ApiResponse<RoleListDto[]>>('/roles') };
+export const channelConnectionsApi = {
+  list: () => api.get<ApiResponse<ChannelConnectionDto[]>>('/channel-connections'),
+  create: (body: { channelType: number; channelName: string }) => api.post<ApiResponse<ChannelConnectionDto>>('/channel-connections', body),
+};
+export const followUpsApi = {
+  list: (pendingOnly?: boolean) => api.get<ApiResponse<FollowUpListDto[]>>('/follow-ups', { params: { pendingOnly } }),
+  create: (body: { commentId?: number; customerId?: number; assignedUserId: number; targetTimeUtc: string; note?: string }) =>
+    api.post<ApiResponse<FollowUpListDto>>('/follow-ups', body),
+  markDone: (id: number, note?: string) => api.post<ApiResponse<FollowUpListDto>>(`/follow-ups/${id}/done`, { note }),
+};

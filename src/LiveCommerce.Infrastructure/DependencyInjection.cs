@@ -2,9 +2,13 @@ using LiveCommerce.Application.Common;
 using LiveCommerce.Application.Comments;
 using LiveCommerce.Application.LiveSessions;
 using LiveCommerce.Application.Blacklists;
+using LiveCommerce.Application.Channels;
 using LiveCommerce.Application.Dashboard;
+using LiveCommerce.Application.FollowUps;
 using LiveCommerce.Application.Orders;
 using LiveCommerce.Application.Products;
+using LiveCommerce.Application.Roles;
+using LiveCommerce.Application.Users;
 using LiveCommerce.Infrastructure.Messaging;
 using LiveCommerce.Infrastructure.Persistence;
 using LiveCommerce.Infrastructure.Services;
@@ -43,6 +47,10 @@ public static class DependencyInjection
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IDashboardService, DashboardService>();
         services.AddScoped<IBlacklistService, BlacklistService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IChannelConnectionService, ChannelConnectionService>();
+        services.AddScoped<IFollowUpService, FollowUpService>();
 
         return services;
     }
