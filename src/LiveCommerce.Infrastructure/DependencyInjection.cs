@@ -33,6 +33,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ICommentIngestionService, CommentIngestionService>();
         services.AddScoped<ICommentQueryService, CommentQueryService>();
+        services.AddScoped<ICommentAssignmentService, CommentAssignmentService>();
         services.AddScoped<ILiveSessionService, LiveSessionService>();
 
         return services;

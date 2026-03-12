@@ -37,8 +37,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
             ClockSkew = TimeSpan.Zero
         };
+        options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+        {
+            OnMessageReceived = ctx =>
+            {
+                var accessToken = ctx.Request.Query["access_token"];
+                var path = ctx.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                    ctx.Token = accessToken;
+                return Task.CompletedTask;
+            }
+        };
     });
 builder.Services.AddAuthorization();
+builder.Services.AddSignalR();
 
 builder.Services.AddCors(options =>
 {
@@ -65,6 +77,7 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<LiveCommerce.Api.Hubs.CommentHub>("/hubs/comments");
 
 // Apply migrations on startup in dev (optional)
 using (var scope = app.Services.CreateScope())

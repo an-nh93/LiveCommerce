@@ -93,4 +93,15 @@ export const liveSessionsApi = {
 export const commentsApi = {
   list: (params: { liveSessionId?: number; status?: number; assignedUserId?: number; page?: number; pageSize?: number }) =>
     api.get<ApiResponse<PagedResult<CommentListDto>>>('/comments', { params }),
+  getById: (id: number) => api.get<ApiResponse<CommentDetailDto>>(`/comments/${id}`),
+  take: (id: number) => api.post<ApiResponse<CommentListDto>>(`/comments/${id}/take`),
+  assign: (id: number, assignToUserId: number) => api.post<ApiResponse<CommentListDto>>(`/comments/${id}/assign`, { assignToUserId }),
+  updateStatus: (id: number, status: number, note?: string) => api.post<ApiResponse<CommentListDto>>(`/comments/${id}/status`, { status, note }),
 };
+
+export interface CommentDetailDto extends CommentListDto {
+  rawPayloadJson?: string;
+  customerId?: number;
+  customerName?: string;
+  customerPhone?: string;
+}
