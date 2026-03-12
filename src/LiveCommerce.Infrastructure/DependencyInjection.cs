@@ -1,4 +1,7 @@
 using LiveCommerce.Application.Common;
+using LiveCommerce.Application.Comments;
+using LiveCommerce.Application.LiveSessions;
+using LiveCommerce.Infrastructure.Messaging;
 using LiveCommerce.Infrastructure.Persistence;
 using LiveCommerce.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -11,12 +14,26 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        var rabbitSection = configuration.GetSection(RabbitMQOptions.Section);
+        services.Configure<RabbitMQOptions>(opt =>
+        {
+            opt.HostName = rabbitSection["HostName"] ?? "localhost";
+            opt.Port = int.TryParse(rabbitSection["Port"], out var p) ? p : 5672;
+            opt.UserName = rabbitSection["UserName"] ?? "guest";
+            opt.Password = rabbitSection["Password"] ?? "guest";
+            opt.CommentIngestionQueue = rabbitSection["CommentIngestionQueue"] ?? "livecommerce.comment.ingestion";
+        });
+        services.AddSingleton<IRabbitMQPublisher, RabbitMQPublisher>();
+
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(
                 configuration.GetConnectionString("DefaultConnection"),
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ICommentIngestionService, CommentIngestionService>();
+        services.AddScoped<ICommentQueryService, CommentQueryService>();
+        services.AddScoped<ILiveSessionService, LiveSessionService>();
 
         return services;
     }

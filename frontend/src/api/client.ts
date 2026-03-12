@@ -55,3 +55,42 @@ export const authApi = {
     api.post<ApiResponse<LoginResult>>('/auth/login', { shopCode, username, password }),
   me: () => api.get<ApiResponse<CurrentUser>>('/auth/me'),
 };
+
+export interface LiveSessionDto {
+  id: number;
+  name: string;
+  externalLiveId?: string;
+  startedAtUtc: string;
+  endedAtUtc?: string;
+  isActive: boolean;
+}
+
+export interface CommentListDto {
+  id: number;
+  liveSessionId: number;
+  liveSessionName: string;
+  content: string;
+  commentTimeUtc: string;
+  senderName?: string;
+  senderExternalId?: string;
+  status: number;
+  assignedUserId?: number;
+  assignedUserName?: string;
+  isSpam: boolean;
+}
+
+export interface PagedResult<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export const liveSessionsApi = {
+  list: () => api.get<ApiResponse<LiveSessionDto[]>>('/live-sessions'),
+};
+
+export const commentsApi = {
+  list: (params: { liveSessionId?: number; status?: number; assignedUserId?: number; page?: number; pageSize?: number }) =>
+    api.get<ApiResponse<PagedResult<CommentListDto>>>('/comments', { params }),
+};

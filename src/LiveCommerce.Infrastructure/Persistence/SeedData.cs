@@ -1,4 +1,5 @@
 using LiveCommerce.Domain.Entities;
+using LiveCommerce.Domain.Enums;
 using LiveCommerce.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -19,6 +20,17 @@ public static class SeedData
             CreatedAtUtc = DateTime.UtcNow
         };
         db.Shops.Add(shop);
+        await db.SaveChangesAsync(ct);
+
+        var channel = new ChannelConnection
+        {
+            ShopId = shop.Id,
+            ChannelType = ChannelType.TikTok,
+            ChannelName = "TikTok Demo",
+            IsActive = true,
+            CreatedAtUtc = DateTime.UtcNow
+        };
+        db.ChannelConnections.Add(channel);
         await db.SaveChangesAsync(ct);
 
         var role = new Role
@@ -55,6 +67,19 @@ public static class SeedData
         db.Users.Add(user);
         await db.SaveChangesAsync(ct);
 
-        logger.LogInformation("Seed data created: Shop SHOP01, user admin / admin123");
+        var liveSession = new LiveSession
+        {
+            ShopId = shop.Id,
+            ChannelConnectionId = channel.Id,
+            Name = "Livestream demo",
+            ExternalLiveId = "demo-live-1",
+            StartedAtUtc = DateTime.UtcNow,
+            IsActive = true,
+            CreatedAtUtc = DateTime.UtcNow
+        };
+        db.LiveSessions.Add(liveSession);
+        await db.SaveChangesAsync(ct);
+
+        logger.LogInformation("Seed data created: Shop SHOP01, user admin/admin123, channel, live session");
     }
 }
